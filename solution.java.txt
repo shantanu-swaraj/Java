@@ -1,0 +1,63 @@
+import java.io.*;
+import java.util.* ;
+
+
+public class Solution{
+    public static List<int[]> pairSum(int[] arr, int s) {
+        // Write your code here.
+        List<int[]> result = new ArrayList<>();
+        Map<Integer,Integer> freqMap = new HashMap<>();
+        for(int num : arr){
+            freqMap.put(num,freqMap.getOrDefault(num,0)+1);
+        }
+        for(int num : arr){
+            int complement = s - num;
+            if(freqMap.containsKey(complement)){
+                if(num==complement){
+                    int count = freqMap.get(num);
+                    int pairs = count * (count -1) / 2;
+                    for(int i=0;i<pairs;i++){
+                        addPair(result,num,complement);
+                    }
+                    freqMap.remove(num);
+                }else{
+                    int pairs= freqMap.get(num)* freqMap.get(complement);
+                    for(int i=0;i<pairs;i++){
+                        addPair(result,Math.min(num,complement), Math.max(num,complement));
+                    }
+                    freqMap.remove(num);
+                    freqMap.remove(complement);
+                }
+            }
+        }
+        result.sort((a,b)->{
+            if(a[0]!=b[0]){
+                return Integer.compare(a[0],b[0]);
+
+            }else{
+                return Integer.compare(a[1],b[1]);
+            }
+        });
+        return result;
+    }
+
+    public static void addPair(List<int[]> result, int a, int b){
+        result.add(new int[] {a,b});
+
+    }
+
+    public static void main(String[] args){
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int s = scanner.nextInt();
+        int[] arr = new int[n];
+        for(int i=0;i<n;i++){
+            arr[i]=scanner.nextInt();
+        }
+
+        List<int[]> pairs = pairSum(arr,s);
+        for(int[] Pair : pairs){
+            System.out.println(Pair[0]+""+Pair[1]);
+        }
+    }
+}
