@@ -1,43 +1,63 @@
+import java.io.*;
 import java.util.* ;
-import java.io.*; 
-import java.util.ArrayList;
 
-public class Solution 
-{
-    public static void reverseArray(ArrayList<Integer> arr, int m)
-    {
+
+public class Solution{
+    public static List<int[]> pairSum(int[] arr, int s) {
         // Write your code here.
-        if(m<0 || m>=arr.size()-1){
-            return;
+        List<int[]> result = new ArrayList<>();
+        Map<Integer,Integer> freqMap = new HashMap<>();
+        for(int num : arr){
+            freqMap.put(num,freqMap.getOrDefault(num,0)+1);
         }
-        ArrayList<Integer> subList = new ArrayList<>(arr.subList(m+1,arr.size()));
-        Collections.reverse(subList);
+        for(int num : arr){
+            int complement = s - num;
+            if(freqMap.containsKey(complement)){
+                if(num==complement){
+                    int count = freqMap.get(num);
+                    int pairs = count * (count -1) / 2;
+                    for(int i=0;i<pairs;i++){
+                        addPair(result,num,complement);
+                    }
+                    freqMap.remove(num);
+                }else{
+                    int pairs= freqMap.get(num)* freqMap.get(complement);
+                    for(int i=0;i<pairs;i++){
+                        addPair(result,Math.min(num,complement), Math.max(num,complement));
+                    }
+                    freqMap.remove(num);
+                    freqMap.remove(complement);
+                }
+            }
+        }
+        result.sort((a,b)->{
+            if(a[0]!=b[0]){
+                return Integer.compare(a[0],b[0]);
 
-        for(int i=m+1,j=0;i<arr.size();i++,j++){
-            arr.set(i,subList.get(j));
-        }
+            }else{
+                return Integer.compare(a[1],b[1]);
+            }
+        });
+        return result;
+    }
+
+    public static void addPair(List<int[]> result, int a, int b){
+        result.add(new int[] {a,b});
+
     }
 
     public static void main(String[] args){
         Scanner scanner = new Scanner(System.in);
-        int t= scanner.nextInt();
-        for(int testCase=0 ; testCase<t ; testCase++){
-            int n=scanner.nextInt();
-            int m=scanner.nextInt();
+        int n = scanner.nextInt();
+        int s = scanner.nextInt();
+        int[] arr = new int[n];
+        for(int i=0;i<n;i++){
+            arr[i]=scanner.nextInt();
+        }
 
-            ArrayList<Integer> arr=new ArrayList<>();
-            for(int i=0; i<n; i++){
-                arr.add(scanner.nextInt());
-            }
-
-            reverseArray(arr,m);
-            for(int i=0;i<arr.size();i++){
-                System.out.print(arr.get(i));
-                if(i<arr.size()-1){
-                    System.out.println(" ");
-                }
-            }
-            System.out.println();
+        List<int[]> pairs = pairSum(arr,s);
+        for(int[] Pair : pairs){
+            System.out.println(Pair[0]+""+Pair[1]);
         }
     }
 }
